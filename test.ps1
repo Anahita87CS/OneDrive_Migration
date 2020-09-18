@@ -1,6 +1,6 @@
 param (
     
-    [Parameter(Position=0,mandatory=$true)]
+    [Parameter(Position=0,mandatory=$false)]
     [string]$type,
     [Parameter(Position=1,mandatory=$true)]
     [string]$csvFile
