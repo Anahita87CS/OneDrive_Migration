@@ -46,13 +46,13 @@ foreach ($row in $table) {
  $srcList = Get-List -Site $srcSite -Name "Documents"
  $dstList = Get-List -Site $dstSite -Name "Documents"
 
- if(!$srcList){
+ if(! $srcList){
      Write-Host ("The source list " +$srcList+ " does not exist") 
 
  }
  else{
 
- Copy-Content -SourceList $srcList -DestinationList $dstList
+ Copy-Content -SourceList $srcList -DestinationList $dstList -DestinationFolder "Migrated Data"
 }
  Remove-SiteCollectionAdministrator -Site $srcSite
  Remove-SiteCollectionAdministrator -Site $dstSite
@@ -60,7 +60,7 @@ foreach ($row in $table) {
 }
 
 
-if($type -eq "Server"){
+if($type.ToUpper() -eq "SERVER"){
     Write-Host "Server - OneDrive migration"
 #$csvFile = "C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\url.csv" 
 $table = Import-Csv -Path $csvFile -Delimiter ","
@@ -72,7 +72,8 @@ foreach ($row in $table) {
     $dstSite = Connect-Site -Url $row.ONEDRIVEURL -Username $row.DestinationUserName -Password $despas
     Add-SiteCollectionAdministrator -Site $dstSite
     $dstList = Get-List -Name Documents -Site $dstSite
-    Import-Document -SourceFolder $row.DIRECTORY -DestinationList $dstList
+    #Import-Document -SourceFolder $row.DIRECTORY -DestinationList $dstList
+    Import-Document -SourceFolder $row.DIRECTORY -DestinationList $dstList -DestinationFolder "Migrated Data"
     Remove-SiteCollectionAdministrator -Site $dstSite
 }
 }
