@@ -25,7 +25,7 @@ param (
  
 Import-Module Sharegate
 
-if($type -eq "OneDrive"){
+if($type.ToUpper() -eq "ONEDRIVE"){
     Write-Host "OneDrive - OneDrive migration"
 
 $table = Import-Csv $csvFile -Delimiter ","
@@ -46,8 +46,14 @@ foreach ($row in $table) {
  $srcList = Get-List -Site $srcSite -Name "Documents"
  $dstList = Get-List -Site $dstSite -Name "Documents"
 
- Copy-Content -SourceList $srcList -DestinationList $dstList
+ if(!$srcList){
+     Write-Host ("The source list " +$srcList+ " does not exist") 
 
+ }
+ else{
+
+ Copy-Content -SourceList $srcList -DestinationList $dstList
+}
  Remove-SiteCollectionAdministrator -Site $srcSite
  Remove-SiteCollectionAdministrator -Site $dstSite
 }
@@ -56,7 +62,7 @@ foreach ($row in $table) {
 
 if($type -eq "Server"){
     Write-Host "Server - OneDrive migration"
-#$csvFile = "C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\url.csv"
+#$csvFile = "C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\url.csv" 
 $table = Import-Csv -Path $csvFile -Delimiter ","
 Set-Variable dstSite, dstList
 foreach ($row in $table) {
