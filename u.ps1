@@ -54,12 +54,13 @@ foreach($serverFileName in $files ){
       
        if($displayNameofOneDrive.DisplayName -eq $serverFileName ){
             Write-Host ("URL.DisplayName: " + $displayNameofOneDrive.DisplayName + " =  serverFileName: " +$serverFileName) -ForegroundColor Green
-           # $dstSite = Connect-Site -Url $URL.PersonalUrl  -Username $dstUsername -Password $dstPassword
-           # Write-Host ("Destination site :    "+$dstSite)
-           # Add-SiteCollectionAdministrator -Site $dstSite
-          #  $dstList = Get-List -Name Documents -Site $dstSite
-           # Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList -DestinationFolder "Migrated Data"
-           # Remove-SiteCollectionAdministrator -Site $dstSite
+            
+            $dstSite = Connect-Site -Url $displayNameofOneDrive.PersonalUrl  -Username $dstUsername -Password $dstPassword
+            Write-Host ("Destination site :    "+$dstSite)
+            Add-SiteCollectionAdministrator -Site $dstSite
+            $dstList = Get-List -Name Documents -Site $dstSite
+            Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList -DestinationFolder "Migrated Data"
+            Remove-SiteCollectionAdministrator -Site $dstSite
         }
        
        
