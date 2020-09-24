@@ -2,6 +2,7 @@ Import-Module Sharegate
 #Get list of file inventory on server and write it in a .txt file
 Get-ChildItem -path C:\Users\aatash-biz-yeganeh\OneDrive_Migration_Folder -recurse | Select-Object FullName,DirectoryName | Export-Csv C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\Inventory.csv -NoTypeInformation
 
+# Install Azure AD if it is not already installed
 if (!(Get-Module AzureAD)) {
        Install-Module  AzureAD -Force -AllowClobber
     }
@@ -27,17 +28,12 @@ foreach ($user in $Users)
             }
         }
 }
+
+# to test if I got the correct UPN and display name of users
 $UsersArray | Select-Object DisplayName, UserPrincipalName | Export-Csv -Path "C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\OneDrive_Users.csv" -NoTypeInformation
 
-foreach($a in $UsersArray){
-    #Write-Host ("DisplayName :" + $a.DisplayName + " UPN : "+ $a.UserPrincipalName)
-    
 
-}
-
-
-# Get OneDrive URL , should work on a way to get Emails of all users in tenant
-#$table = @("sara@MigrationLearning.onmicrosoft.com","anaatash@MigrationLearning.onmicrosoft.com")
+# Get OneDrive URLs of users in O365 tenant
 foreach ($row in $Users) {
     $dstresult = Get-OneDriveUrl -Tenant $dsttenant -Email $row.UserPrincipalName -ProvisionIfRequired -DoNotWaitForProvisioning
     $displayNameofOneDrive = Get-PnPUserProfileProperty -Account $row.UserPrincipalName
@@ -47,6 +43,30 @@ foreach ($row in $Users) {
     }
 }
 
+#Get files on server (here, My PC for test) and put the path/URL in an array
+[array]$files=Get-ChildItem -path "C:\Users\aatash-biz-yeganeh\OneDrive_Migration_Folder"  
+foreach($serverFileName in $files ){
+    Write-Host ("Path of files on my pc: " + $serverFileName.fullName) -ForegroundColor Gray 
+    Write-Host ("Name of the user folder on my pc: " + $serverFileName) -ForegroundColor Red
+    foreach($OneDriveuser in $Users){
+        $dstresult = Get-OneDriveUrl -Tenant $dsttenant -Email $OneDriveuser.UserPrincipalName -ProvisionIfRequired -DoNotWaitForProvisioning
+        $displayNameofOneDrive = Get-PnPUserProfileProperty -Account $OneDriveuser.UserPrincipalName
+      
+       if($displayNameofOneDrive.DisplayName -eq $serverFileName ){
+            Write-Host ("URL.DisplayName: " + $displayNameofOneDrive.DisplayName + " =  serverFileName: " +$serverFileName) -ForegroundColor Green
+           # $dstSite = Connect-Site -Url $URL.PersonalUrl  -Username $dstUsername -Password $dstPassword
+           # Write-Host ("Destination site :    "+$dstSite)
+           # Add-SiteCollectionAdministrator -Site $dstSite
+          #  $dstList = Get-List -Name Documents -Site $dstSite
+           # Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList -DestinationFolder "Migrated Data"
+           # Remove-SiteCollectionAdministrator -Site $dstSite
+        }
+       
+       
+        
+    }
+
+}
 <#
 # work on this part 
 [array]$files=Get-ChildItem -path "C:\Users\aatash-biz-yeganeh\OneDrive_Migration_Folder"  
