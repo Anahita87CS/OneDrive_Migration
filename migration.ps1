@@ -1,31 +1,9 @@
-<#
-$tenant = Connect-Site -Url "https://swordcanada-admin.sharepoint.com" -Browser
-$csvFile = "C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\url.csv"
-$table = Import-Csv $csvFile -Delimiter ","
-foreach ($row in $table) {
-    Get-OneDriveUrl -Tenant $tenant -Email $row.Email -ProvisionIfRequired -DoNotWaitForProvisioning
-}
 
-
-Write-Host "step 1"
-$mypassword = ConvertTo-SecureString "Annakjkj@75" -AsPlainText -Force
-$tenant = Connect-Site -Url "https://swordcanada-admin.sharepoint.com" -Username "anahita.atash-biz-yeganeh@swordcanada.onmicrosoft.com" -Password $mypassword
-Get-OneDriveUrl -Tenant $tenant -Email anahita.atash-biz-yeganeh@swordcanada.onmicrosoft.com -ProvisionIfRequired -DoNotWaitForProvisioning
-#>
-
-param (
-    
-    [Parameter(Position=0,mandatory=$true)]
-    [string]$type,
-    [Parameter(Position=1,mandatory=$true)]
-    [string]$csvFile
-
-   
-)
- 
 Import-Module Sharegate
+$choice = Read-Host "The migration is OneDrive to OneDrive (1) or Server to OneDrive(2)? "
+$csvFile = Read-Host "Enter the file path  "
 
-if($type.ToUpper() -eq "ONEDRIVE"){
+if($choice -eq "1"){
     Write-Host "OneDrive - OneDrive migration"
 
 $table = Import-Csv $csvFile -Delimiter ","
@@ -46,21 +24,17 @@ foreach ($row in $table) {
  $srcList = Get-List -Site $srcSite -Name "Documents"
  $dstList = Get-List -Site $dstSite -Name "Documents"
 
- if(! $srcList){
-     Write-Host ("The source list " +$srcList+ " does not exist") 
-
- }
- else{
+ 
 
  Copy-Content -SourceList $srcList -DestinationList $dstList -DestinationFolder "Migrated Data"
-}
+
  Remove-SiteCollectionAdministrator -Site $srcSite
  Remove-SiteCollectionAdministrator -Site $dstSite
 }
 }
 
 
-if($type.ToUpper() -eq "SERVER"){
+if($choice -eq "2"){
     Write-Host "Server - OneDrive migration"
 #$csvFile = "C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\url.csv" 
 $table = Import-Csv -Path $csvFile -Delimiter ","
@@ -72,7 +46,7 @@ foreach ($row in $table) {
     $dstSite = Connect-Site -Url $row.ONEDRIVEURL -Username $row.DestinationUserName -Password $despas
     Add-SiteCollectionAdministrator -Site $dstSite
     $dstList = Get-List -Name Documents -Site $dstSite
-    #Import-Document -SourceFolder $row.DIRECTORY -DestinationList $dstList
+    
     Import-Document -SourceFolder $row.DIRECTORY -DestinationList $dstList -DestinationFolder "Migrated Data"
     Remove-SiteCollectionAdministrator -Site $dstSite
 }
