@@ -1,3 +1,0 @@
-﻿Migration Phase;Site To Migrate;To Be Migrated;Migrate To;Source Site URL;Target SPO Site URL;Site Name;List Name;SPO / Teams Name;Container Type
-PoC;Yes;Yes;ModernTeamSite (SPO only);https://migrationlearning.sharepoint.com/sites/chopards;https://swordcanada.sharepoint.com/sites/Anna_Test;chopards;Facteur;Anna_Test;DocumentLibrary
-PoC;Yes;Yes;ModernTeamSite (SPO only);https://migrationlearning.sharepoint.com/sites/chopards;https://swordcanada.sharepoint.com/sites/Anna_Test;chopards;ETS;Anna_Test;GenericList
