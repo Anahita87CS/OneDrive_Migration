@@ -1,11 +1,17 @@
 Import-Module Sharegate
+
+
 #Get list of file inventory on server and write it in a .txt file
 Get-ChildItem -path C:\Users\aatash-biz-yeganeh\OneDrive_Migration_Folder -recurse | Select-Object FullName,DirectoryName | Export-Csv C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\Inventory.csv -NoTypeInformation
 
+if(!(Get-Module SharePointPnPPowerShellOnline))  {
+    Install-Module  SharePointPnPPowerShellOnline -Force -AllowClobber
+}
 # Install Azure AD if it is not already installed
 if (!(Get-Module AzureAD)) {
        Install-Module  AzureAD -Force -AllowClobber
     }
+  
 
 $dstUsername = "AnaAtash@migrationlearning.onmicrosoft.com"
 $dstPassword = ConvertTo-SecureString "Annakjkj@75" -AsPlainText -Force
