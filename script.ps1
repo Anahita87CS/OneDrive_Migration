@@ -78,7 +78,7 @@ foreach($serverFileName in $files ){
            
             Add-SiteCollectionAdministrator -Site $dstSite
             $dstList = Get-List -Name Documents -Site $dstSite
-            #Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList -DestinationFolder "Migrated Data"
+            Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList 
             Remove-SiteCollectionAdministrator -Site $dstSite
         }
        

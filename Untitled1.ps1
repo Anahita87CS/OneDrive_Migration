@@ -1,0 +1,2 @@
+﻿$cred=Get-AutomationPSCredential
+
