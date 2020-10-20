@@ -1,4 +1,4 @@
-Import-Module Sharegate
+﻿Import-Module Sharegate
 if(!(Get-Module SharePointPnPPowerShellOnline))  {
     Install-Module  SharePointPnPPowerShellOnline -Force -AllowClobber
 }
@@ -16,13 +16,12 @@ $dstPassword = ConvertTo-SecureString "Annakjkj@75" -AsPlainText -Force
 [System.Management.Automation.PSCredential]$destinationMigrationCredentials = New-Object System.Management.Automation.PSCredential($dstUsername, $dstPassword)
 $dsttenant = Connect-Site -Url "https://MigrationLearning-admin.sharepoint.com" -Username $dstUsername -Password $dstPassword
 Connect-PnPOnline -url "https://MigrationLearning-admin.sharepoint.com" -Credentials $destinationMigrationCredentials
-
 Connect-AzureAD -Credential $destinationMigrationCredentials
 
 
 # Get the list of all licensed users in O365 Azure AD and create an array that holds the user's UPN
 $Users = Get-AzureADUser -All $True | Where {$_.UserType -eq 'Member' -and $_.AssignedLicenses -ne $null}
-$UsersArray = @()
+$UsersArray = @() #array of all UPN
 
 foreach ($user in $Users) 
 {
@@ -40,38 +39,55 @@ foreach ($user in $Users)
 $UsersArray | Select-Object DisplayName, UserPrincipalName | Export-Csv -Path "C:\Users\aatash-biz-yeganeh\oneDriveTest-ShareGate\OneDrive_Users.csv" -NoTypeInformation
 
 # Create OneDrive for licensed users in O365 tenant (using array of UPN we created for licensed users)
-Write-Host "Creating OneDrive for licensed users  " -ForegroundColor Yellow
+Write-Host "Created these OneDrive for licensed users : " -ForegroundColor Yellow
 foreach($email in $UsersArray){    
-    New-PnPPersonalSite -Email $email.UserPrincipalName    
-    #Write-Host $email.UserPrincipalName -ForegroundColor Yellow  
+    New-PnPPersonalSite -Email $email.UserPrincipalName
+    
+    
 }
 
-Write-Host "Migration started"
-#Get files on server (here, My PC for test) and put the path/URL of each folder in an array - The name of folder should match the name of OneDrive in O365
+
+# Get OneDrive URLs of licensed users in O365 tenant
+ $AllOneDrives = @()
+foreach ($row in $Users) {   
+    $dstresult = Get-OneDriveUrl -Tenant $dsttenant -Email $row.UserPrincipalName -ProvisionIfRequired  -DoNotWaitForProvisioning 
+        $AllOneDrives += $dstresult        
+}
+Write-Host (" "+$AllOneDrives + "/") -ForegroundColor White
+
+foreach($drive in $AllOneDrives){     
+         Connect-PnPOnline -Url $drive -Credentials $destinationMigrationCredentials
+             #ensure folder in SharePoint online using powershell
+                $file = Add-PnPFolder -Name "LEMdata2" -Folder "Documents" -ErrorAction SilentlyContinue
+      }
+
+      
 [array]$files=Get-ChildItem -path "C:\Users\aatash-biz-yeganeh\OneDrive_Migration_Folder"  
 
 foreach($serverFileName in $files ){
-   # Write-Host ("Path of files on my pc: " + $serverFileName.fullName) -ForegroundColor Gray 
-   # Write-Host ("Name of the user folder on my pc: " + $serverFileName) -ForegroundColor Red
-    
+    Write-Host ("Path of files on my pc: " + $serverFileName.fullName) -ForegroundColor Gray 
+    Write-Host ("Name of the user folder on my pc: " + $serverFileName) -ForegroundColor Red
     foreach($OneDriveuser in $Users){
-        
        
+ 
+
         Get-OneDriveUrl -Tenant $dsttenant -Email $OneDriveuser.UserPrincipalName -ProvisionIfRequired -DoNotWaitForProvisioning
-        $displayNameofOneDrive = Get-PnPUserProfileProperty -Account $OneDriveuser.UserPrincipalName
+        Connect-PnPOnline -url "https://MigrationLearning-admin.sharepoint.com" -Credentials $destinationMigrationCredentials 
+        $displayNameofOneDrive = Get-PnPUserProfileProperty -Account $OneDriveuser.UserPrincipalName -ErrorAction SilentlyContinue
       
        if($displayNameofOneDrive.DisplayName -eq $serverFileName ){
             Write-Host ("URL.DisplayName: " + $displayNameofOneDrive.DisplayName + " =  serverFileName: " +$serverFileName) -ForegroundColor Green
             
             $dstSite = Connect-Site -Url $displayNameofOneDrive.PersonalUrl  -Username $dstUsername -Password $dstPassword
       
-            Write-Host ("Destination site :    "+$dstSite) -ForegroundColor Red -BackgroundColor Yellow
+            Write-Host ("Destination site :    "+$dstSite) -BackgroundColor Yellow
         
             Add-SiteCollectionAdministrator -Site $dstSite
 
             $dstList = Get-List -Name Documents -Site $dstSite
-            Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList 
-            Remove-SiteCollectionAdministrator -Site $dstSite
+            Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList -DestinationFolder "LEMdata2"
+            #Remove-SiteCollectionAdministrator -Site $dstSite
+            
         }
        
        
@@ -79,3 +95,7 @@ foreach($serverFileName in $files ){
     }
 
 }
+   
+  
+    
+
