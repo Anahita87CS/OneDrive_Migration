@@ -53,12 +53,12 @@ foreach ($row in $Users) {
     $dstresult = Get-OneDriveUrl -Tenant $dsttenant -Email $row.UserPrincipalName -ProvisionIfRequired  -DoNotWaitForProvisioning 
         $AllOneDrives += $dstresult        
 }
-Write-Host (" "+$AllOneDrives + "/") -ForegroundColor White
+
 
 foreach($drive in $AllOneDrives){     
-         Connect-PnPOnline -Url $drive -Credentials $destinationMigrationCredentials
+         #Connect-PnPOnline -Url $drive -Credentials $destinationMigrationCredentials
              #ensure folder in SharePoint online using powershell
-                $file = Add-PnPFolder -Name "LEMdata2" -Folder "Documents" -ErrorAction SilentlyContinue
+                $file = Add-PnPFolder -Name "Montreal Office" -Folder "Documents" -ErrorAction SilentlyContinue
       }
 
       
@@ -72,7 +72,7 @@ foreach($serverFileName in $files ){
  
 
         Get-OneDriveUrl -Tenant $dsttenant -Email $OneDriveuser.UserPrincipalName -ProvisionIfRequired -DoNotWaitForProvisioning
-        Connect-PnPOnline -url "https://MigrationLearning-admin.sharepoint.com" -Credentials $destinationMigrationCredentials 
+      
         $displayNameofOneDrive = Get-PnPUserProfileProperty -Account $OneDriveuser.UserPrincipalName -ErrorAction SilentlyContinue
       
        if($displayNameofOneDrive.DisplayName -eq $serverFileName ){
@@ -85,8 +85,8 @@ foreach($serverFileName in $files ){
             Add-SiteCollectionAdministrator -Site $dstSite
 
             $dstList = Get-List -Name Documents -Site $dstSite
-            Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList -DestinationFolder "LEMdata2"
-            #Remove-SiteCollectionAdministrator -Site $dstSite
+            Import-Document -SourceFolder $serverFileName.fullName -DestinationList $dstList -DestinationFolder "Montreal Office"
+            Remove-SiteCollectionAdministrator -Site $dstSite
             
         }
        
