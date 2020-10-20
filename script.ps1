@@ -55,8 +55,7 @@ foreach($serverFileName in $files ){
    # Write-Host ("Name of the user folder on my pc: " + $serverFileName) -ForegroundColor Red
     
     foreach($OneDriveuser in $Users){
-        
-       
+  
         Get-OneDriveUrl -Tenant $dsttenant -Email $OneDriveuser.UserPrincipalName -ProvisionIfRequired -DoNotWaitForProvisioning
         $displayNameofOneDrive = Get-PnPUserProfileProperty -Account $OneDriveuser.UserPrincipalName
       
