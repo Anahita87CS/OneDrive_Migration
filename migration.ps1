@@ -85,21 +85,14 @@ Write-Output "Users who have the license"
 Start-Sleep -Seconds 30
 
 
-
-
-
-
 Write-Host "Migration started" -ForegroundColor Yellow
 #Get files on server (here, My PC for test) and put the path/URL of each folder in an array - The name of folder should match the name of OneDrive in O365
 [array]$files=Get-ChildItem -path $ServerPath   
 
 
 foreach($serverFileName in $files ){
-    # Write-Host ("Path of files on my pc: " + $serverFileName.fullName) -ForegroundColor Gray 
-    # Write-Host ("Name of the user folder on my pc: " + $serverFileName) -ForegroundColor Red
-     
+    
      foreach($OneDriveuser in $Users){
-
         
         if($OneDriveuser.DisplayName -eq $serverFileName ){
              Write-Host ("URL.DisplayName: " + $OneDriveuser.DisplayName + " =  serverFileName: " +$serverFileName) -ForegroundColor Green
@@ -136,4 +129,4 @@ foreach($serverFileName in $files ){
 
 
 
-# Also, give site collection admin before connect-site  OR connect-PnPOnline to onedrive -> create folder inside onedrive -> connect-site and the rest 
+
