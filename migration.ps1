@@ -44,22 +44,17 @@ if(!(Get-Module SharePointPnPPowerShellOnline))  {
 }
 
 
- 
-   
-            
+           
 $dsttenant = Connect-Site -Url $TenantUrl -Username $dstUsername -Password $dstPassword
 Connect-PnPOnline -url $TenantUrl -Credentials $destinationMigrationCredentials
 Connect-SPOService -Credential $destinationMigrationCredentials -Url $TenantUrl
-
-
-
 
 
 Connect-MsolService -Credential $destinationMigrationCredentials
 # Get the list of all licensed users in O365 Azure AD and create an array that holds the user's UPN
 $Users = Get-MsolUser -All | Where-Object { $_.islicensed -eq $true }
 Write-Output "Users who have the license"
-#$Users | Select-Object DisplayName, UserPrincipalName
+
 
  
 
@@ -104,8 +99,6 @@ foreach($serverFileName in $files ){
             $DestinationFolder = Add-PnPFolder -Name "Migrated Data"  -Folder "Documents"
  
              $dstSite = Connect-Site -Url $OneDrive  -Username $dstUsername -Password $dstPassword
-            
-             #$dstSite = Connect-Site -Url  $mydrive  -Username $dstUsername -Password $dstPassword
              
        
              Write-Host ("Destination site that we successfully connected to :    "+$dstSite) -ForegroundColor Red -BackgroundColor Yellow
