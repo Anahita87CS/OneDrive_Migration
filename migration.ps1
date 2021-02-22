@@ -31,7 +31,7 @@ param(
 $ServerPath = "C:\Users\aatash-biz-yeganeh\OneDrive_Migration_Folder"
 $TenantUrl="https://swordcanada-admin.sharepoint.com"
 $dstUsername = "anahita.atash-biz-yeganeh@swordcanada.onmicrosoft.com"
-$dstPassword = ConvertTo-SecureString "khodayar@1987" -AsPlainText -Force
+$dstPassword = ConvertTo-SecureString "Password" -AsPlainText -Force
 #$ServerPath = "C:\Users\aatash-biz-yeganeh\OneDrive_Migration_Folder"
 [System.Management.Automation.PSCredential]$destinationMigrationCredentials = New-Object System.Management.Automation.PSCredential($dstUsername, $dstPassword)
 
